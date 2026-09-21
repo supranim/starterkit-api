@@ -1,0 +1,59 @@
+import std/[strutils, tables, times, macros, os]
+import pkg/kapsis/interactive/prompts
+
+when defined supraDBMainSqlite:
+  import pkg/ozark/driver/sqlite
+else:
+  import pkg/ozark/driver/psql
+
+import pkg/supranim/core/services
+import pkg/supranim/core/[paths, config]
+import pkg/supranim/support/[nanoid, auth, url]
+
+import ./events
+
+initService DB[Global]:
+  state do:
+    macro loadModels =
+      # auto discover /database/models/*.nim
+      # nim files prefixed with `!` will be ignored
+      result = newStmtList()
+      for fModel in walkDirRec(modelPath):
+        let f = fModel.splitFile
+        if f.ext == ".nim" and f.name.startsWith("!") == false:
+          add result, nnkImportStmt.newTree(newLit(fModel))
+          add result, nnkExportStmt.newTree(ident(f.name))
+    loadModels() # autoload available models
+
+  api do:
+    proc init*() =
+      loadEnv()
+      when defined supraDBMainSqlite:
+        initOzarkDatabase(address = getEnv("database.name"))
+        initOzarkPool(1)
+      else:
+        initOzarkDatabase(
+          address = getEnv("database.address"),
+          name = getEnv("database.name"),
+          user = getEnv("database.user"),
+          password = getEnv("database.password")
+        )
+        initOzarkPool(10)
+      try:
+        withDBPool do:
+          # create database tables if not exists
+          Models.table(Users).prepareTable().exec()
+          Models.table(UserSessions).prepareTable().exec()
+          Models.table(UserAccountConfirmations).prepareTable().exec()
+          Models.table(UserAccountEmailConfirmations).prepareTable().exec()
+          Models.table(UserAccountPasswordResets).prepareTable().exec()
+          when not defined release:
+            # the following code is used to create a test user account.
+            # this code should be removed in production
+            # and should be moved to a seeder or a migration file.
+            let userRes = Models.table(Users)
+                                .selectAll().where("id", "1").getAll()
+            if userRes.isEmpty:
+              event().emit("account.register", some(@["test@example.com", "strong password here"]))
+      except DbError:
+        displayError("Database connection failed. Please check your database settings.")
