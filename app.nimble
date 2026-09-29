@@ -16,7 +16,7 @@ requires "supranim >= 0.1.11"
 requires "emitter >= 0.2.1"
 requires "limiter >= 0.1.0"
 requires "bag >= 0.1.0"
-requires "openparser >= 0.3.0"
+requires "openparser >= 0.3.5"
 
 import std/[os, strutils]
 task service, "Build a Supranim Service":
