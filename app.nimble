@@ -13,6 +13,7 @@ binDir         = "build"
 
 requires "nim >= 2.0.0"
 requires "supranim >= 0.1.11"
+requires "supranim_session >= 0.1.0"
 requires "emitter >= 0.2.1"
 requires "limiter >= 0.1.0"
 requires "bag >= 0.1.0"
