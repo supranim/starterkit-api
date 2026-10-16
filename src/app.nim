@@ -24,7 +24,7 @@ App.cli do:
 # Initialize available Service Providers.
 #
 # Configuration files are defined as YAML in the
-# `config/` directory.
+# `src/config/` directory.
 #
 App.services do:
   # init Logger Service
