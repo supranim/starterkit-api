@@ -6,3 +6,5 @@ logs/*.log
 .cache/
 .DS_Store
 *.out
+.env
+.env.production
