@@ -1,6 +1,5 @@
-import supranim/controller
-import ../service/provider/tim 
+import pkg/supranim/controller
 
 ctrl get4xx:
-  ## Renders a 4xx error page
-  render("errors.4xx")
+  ## Returns a JSON 404 error payload
+  json(%*{"error": "Not found"}, Http404)

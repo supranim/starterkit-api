@@ -9,13 +9,11 @@ elif defined(linux):
 
 --deepCopy:on
 --mm:atomicArc
---define:webapp
 --define:ssl
 --define:supraFileserver
 --define:supraNative # using pkg/powpow backend
 
 when not defined release:
-  --define:timHotCode
   # Embed assets in production for better performance and easier deployment
   const embedAssetsPath {.strdefine.} = ""
   when defined supraEmbedAssets:

@@ -1,10 +1,5 @@
-import std/[os, json]
-
-import pkg/supranim/[core/paths, controller]
-import ../service/provider/[db, session, tim]
+import pkg/supranim/controller
 
 ctrl getHomepage:
-  ## renders the home page
-  render("index", local = &*{
-    "isAuth": false
-  })
+  ## Returns a JSON welcome payload
+  json(%*{"status": "ok", "message": "Welcome to Supranim REST API"})
